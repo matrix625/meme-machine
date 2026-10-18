@@ -65,12 +65,7 @@
     -webkit-text-size-adjust: 100%;
   }
 
-  /* Zona della barra di stato (iPhone): occupa lo spazio in cima e resta ferma mentre scorri.
-     È "sticky" e non "fixed": gli elementi fissi sul bordo alto fanno comparire una sfocatura di sistema in iOS 26. */
-  .safe-top {
-    position: sticky; top: 0; z-index: 11;
-    height: env(safe-area-inset-top, 0px); background: var(--bg);
-  }
+
   .wrap { max-width: 868px; margin: 0 auto; }
 
   /* Tutti i pulsanti con icona sono quadrati 44 x 44 */
@@ -88,7 +83,7 @@
   .ibtn-text { width: auto; padding: 0 14px; font-weight: 800; font-size: 15px; }
 
   /* Riga del titolo: scorre via insieme alla pagina */
-  .top { padding: 16px 16px 8px; }
+  .top { padding: 4px 16px 8px; }
   .top .wrap { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 10px; }
   .actions { display: flex; align-items: center; gap: 6px; }
   .logo { width: 34px; height: 34px; flex: none; }
@@ -97,9 +92,11 @@
   h1 { display: flex; align-items: center; gap: 10px; margin: 0; font-size: 28px; font-weight: 900; letter-spacing: -0.02em; line-height: 1; }
 
   /* Barra fissa: modalità + cerca, a caso, stop */
+  /* Barra in cima, "sticky" a top: 0, con lo sfondo esteso fino sotto la barra di stato (padding-top con safe-area).
+     Così la sfocatura di sistema di iOS 27 non compare sopra i pulsanti. */
   .bar {
-    position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10;
-    background: var(--bg); padding: 6px 16px 10px;
+    position: sticky; top: 0; z-index: 10;
+    background: var(--bg); padding: calc(env(safe-area-inset-top, 0px) + 8px) 16px 10px;
   }
   .bar .wrap { display: flex; align-items: center; gap: 6px; }
   .bar .bar-search { display: none; }
@@ -277,30 +274,6 @@
 </head>
 <body>
 
-<div class="safe-top" aria-hidden="true"></div>
-
-<div class="top">
-  <div class="wrap">
-    <h1>
-      <svg class="logo" viewBox="0 0 32 32" aria-hidden="true">
-        <defs><clipPath id="logoClip"><rect x="3" y="3" width="26" height="22" rx="6"/></clipPath></defs>
-        <rect class="sh" x="3" y="6" width="26" height="22" rx="6"/>
-        <rect x="3" y="3" width="26" height="22" rx="6" fill="#fff"/>
-        <rect x="3" y="3" width="16" height="22" fill="#FF5A4D" clip-path="url(#logoClip)"/>
-        <rect class="ol" x="3" y="3" width="26" height="22" rx="6"/>
-      </svg>
-      Meme Machine
-    </h1>
-    <div class="actions">
-      <button class="ibtn" id="sndBtn" type="button" aria-pressed="false" hidden></button>
-      <button class="ibtn" id="themeBtn" type="button" aria-label="Cambia tema"></button>
-      <button class="ibtn" id="helpBtn" type="button" aria-label="Come si usa" title="Come si usa">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 0 1 4.9.7c0 1.7-2.5 2.2-2.5 3.8"/><circle cx="12" cy="17.2" r=".7" fill="currentColor" stroke="none"/></svg>
-      </button>
-    </div>
-  </div>
-</div>
-
 <header class="bar" id="bar">
   <div class="wrap bar-main">
     <div class="modes" role="group" aria-label="Modalità di riproduzione">
@@ -328,6 +301,28 @@
     <button class="ibtn ibtn-text" id="searchDone" type="button">Fine</button>
   </div>
 </header>
+
+<div class="top">
+  <div class="wrap">
+    <h1>
+      <svg class="logo" viewBox="0 0 32 32" aria-hidden="true">
+        <defs><clipPath id="logoClip"><rect x="3" y="3" width="26" height="22" rx="6"/></clipPath></defs>
+        <rect class="sh" x="3" y="6" width="26" height="22" rx="6"/>
+        <rect x="3" y="3" width="26" height="22" rx="6" fill="#fff"/>
+        <rect x="3" y="3" width="16" height="22" fill="#FF5A4D" clip-path="url(#logoClip)"/>
+        <rect class="ol" x="3" y="3" width="26" height="22" rx="6"/>
+      </svg>
+      Meme Machine
+    </h1>
+    <div class="actions">
+      <button class="ibtn" id="sndBtn" type="button" aria-pressed="false" hidden></button>
+      <button class="ibtn" id="themeBtn" type="button" aria-label="Cambia tema"></button>
+      <button class="ibtn" id="helpBtn" type="button" aria-label="Come si usa" title="Come si usa">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 0 1 4.9.7c0 1.7-2.5 2.2-2.5 3.8"/><circle cx="12" cy="17.2" r=".7" fill="currentColor" stroke="none"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
 
 <div class="tools">
   <div class="chips" id="chips" role="group" aria-label="Categorie" hidden></div>
