@@ -24,6 +24,6 @@ window.SOUNDS = [
   { name: "Vai a letto", file: "audio/vai-letto.m4a", emoji: "🛏️" },
   { name: "Monella...", file: "audio/monella.m4a", emoji: "☝🏻️" },
   { name: "Noi ndiamo a robare", file: "audio/rubare.m4a", emoji: "🥷🏻" },
-  { name: "Che è la scoteca", file: "audio/scoteca.m4a", emoji: "🕺🏼" },
-  { name: "Porco schifo", file: "audio/porco-schifo.m4a", emoji: "🍹" },
+  { name: "Teresaa", file: "audio/teresa.m4a", emoji: "🗣️" },
+  { name: "Come na catapulta", file: "audio/come-catapulta.m4a", emoji: "🚀" },
 ];
