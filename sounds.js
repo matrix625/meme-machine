@@ -14,7 +14,7 @@ window.SOUNDS = [
   { name: "Ah franzè franzè", file: "audio/franze.m4a", emoji: "🇫🇷" },
   { name: "Collega alt", file: "audio/collega-alt.m4a", emoji: "🧑🏻‍💼" },
   { name: "Un crecs", file: "audio/crecs.m4a", emoji: "🥨" },
-  { name: "La stansa", file: "audio/la-stansa.m4a", emoji: "🚪" },
+  { name: "La stansa", file: "audio/la-stansa.m4a", emoji: "🚪", nfsw: true},
   { name: "Fuoco alla banca", file: "audio/fuoco-banca.m4a", emoji: "🔥" },
   { name: "C**o ci ridi", file: "audio/ci-ridi.m4a", emoji: "😆" },
   { name: "Le fettine di vitello", file: "audio/fettine-vitello.m4a", emoji: "🐄" },
