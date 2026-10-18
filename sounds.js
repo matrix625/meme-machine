@@ -26,4 +26,9 @@ window.SOUNDS = [
   { name: "Noi ndiamo a robare", file: "audio/rubare.m4a", emoji: "🥷🏻" },
   { name: "Teresaa", file: "audio/teresa.m4a", emoji: "🗣️" },
   { name: "Come na catapulta", file: "audio/come-catapulta.m4a", emoji: "🚀" },
+  { name: "Centodiciottoo", file: "audio/118.m4a", emoji: "🚑" },
+  { name: "Come c**o si esce", file: "audio/questo-posto.m4a", emoji: "🏢" },
+  { name: "Io ti tiro sotto", file: "audio/io-ti-tiro-sotto.m4a", emoji: "🚙" },
+  { name: "Non ce n'è Coviddì", file: "audio/coviddì.m4a", emoji: "🦠" },
+  { name: "Maledettiii", file: "audio/maledetti.m4a", emoji: "🤬" },
 ];

@@ -1,6 +1,6 @@
 // Service worker: permette l'uso offline e l'installazione come app.
 // Quando cambi sounds.js, gli mp3 o la pagina, aumenta il numero di VERSION.
-const VERSION = "v20";
+const VERSION = "v21";
 const CACHE = "meme-machine-" + VERSION;
 const SHELL = [
   "./", "index.html", "sounds.js", "manifest.webmanifest",
