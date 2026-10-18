@@ -70,7 +70,7 @@
 
   /* Tutti i pulsanti con icona sono quadrati 44 x 44 */
   .ibtn {
-    display: flex; align-items: center; justify-content: center; flex: none;
+    position: relative; display: flex; align-items: center; justify-content: center; flex: none;
     width: 44px; height: 44px; padding: 0; font: inherit; color: var(--text); background: var(--surface);
     border: 3px solid var(--line); border-radius: 14px; box-shadow: 0 3px 0 var(--line); cursor: pointer;
     touch-action: manipulation; -webkit-tap-highlight-color: transparent;
@@ -82,9 +82,7 @@
   .ibtn svg { display: block; width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
   .ibtn-text { width: auto; padding: 0 14px; font-weight: 800; font-size: 15px; }
 
-  /* Riga del titolo: scorre via insieme alla pagina */
-  .top { padding: 4px 16px 8px; }
-  .top .wrap { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 10px; }
+  /* Riga del titolo (dentro l'intestazione fissa) */
   .actions { display: flex; align-items: center; gap: 6px; }
   .logo { width: 34px; height: 34px; flex: none; }
   .logo .sh { fill: var(--line); }
@@ -95,10 +93,12 @@
   /* Barra in cima, "sticky" a top: 0, con lo sfondo esteso fino sotto la barra di stato (padding-top con safe-area).
      Così la sfocatura di sistema di iOS 27 non compare sopra i pulsanti. */
   .bar {
-    position: sticky; top: 0; z-index: 10;
+    position: sticky; top: 0; z-index: 10; display: flex; flex-direction: column; gap: 8px;
     background: var(--bg); padding: calc(env(safe-area-inset-top, 0px) + 8px) 16px 10px;
   }
-  .bar .wrap { display: flex; align-items: center; gap: 6px; }
+  .bar .wrap { display: flex; align-items: center; gap: 6px; width: 100%; }
+  .bar .bar-title { flex-wrap: wrap; justify-content: space-between; gap: 8px 10px; }
+  .bar.searching .bar-title { display: none; }
   .bar .bar-search { display: none; }
   .bar.searching .bar-main { display: none; }
   .bar.searching .bar-search { display: flex; }
@@ -201,6 +201,47 @@
   .lg-ico svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
   .lg-ico.fav-ico svg { fill: #FFC41F; }
 
+  /* Impostazioni: riga con interruttore */
+  .setting { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+  .setting-text b { display: block; font-size: 16px; font-weight: 800; }
+  .setting-text p { margin: 2px 0 0; font-size: 14px; line-height: 1.3; font-weight: 700; opacity: .75; }
+  .switch {
+    flex: none; position: relative; width: 58px; height: 34px; padding: 0; cursor: pointer;
+    border: 3px solid var(--line); border-radius: 999px; background: var(--surface); box-shadow: 0 3px 0 var(--line);
+    touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+  }
+  .switch .knob { position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: var(--line); transition: transform .15s; }
+  .switch[aria-checked="true"] { background: var(--sel); }
+  .switch[aria-checked="true"] .knob { transform: translateX(24px); background: var(--on-sel); }
+
+  /* Conferma per i contenuti per adulti */
+  .dlg-wrap {
+    position: fixed; inset: 0; z-index: 70; display: flex; align-items: center; justify-content: center;
+    padding: 24px; background: rgba(10, 11, 34, .6);
+  }
+  .dlg-wrap[hidden] { display: none; }
+  .dlg {
+    width: 100%; max-width: 360px; padding: 18px; background: var(--bg); color: var(--text);
+    border: 3px solid var(--line); border-radius: 22px; box-shadow: 0 6px 0 var(--line);
+  }
+  .dlg h2 { margin: 0 0 8px; font-size: 20px; font-weight: 900; }
+  .dlg p { margin: 0 0 16px; font-size: 15px; line-height: 1.35; font-weight: 700; }
+  .dlg-btns { display: flex; gap: 8px; justify-content: flex-end; }
+  .btn-primary { background: var(--sel); color: var(--on-sel); }
+
+  /* Segnali 18+ */
+  .ibtn .dot {
+    position: absolute; top: -8px; right: -8px; padding: 1px 5px; border-radius: 999px;
+    border: 2px solid var(--line); background: #FF5A4D; color: #fff;
+    font-size: 10px; font-weight: 900; line-height: 1.3; pointer-events: none;
+  }
+  .ibtn .dot[hidden] { display: none; }
+  .tag18 {
+    position: absolute; right: 10px; bottom: 10px; z-index: 1; padding: 1px 6px; border-radius: 999px;
+    border: 2px solid currentColor; font-size: 11px; font-weight: 900; line-height: 1.3; opacity: .8; pointer-events: none;
+  }
+  @media (prefers-reduced-motion: reduce) { .switch .knob { transition: none; } }
+
   .toast {
     position: fixed; z-index: 30; left: 16px; right: 16px; max-width: 420px; margin: 0 auto;
     bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
@@ -275,14 +316,33 @@
 <body>
 
 <header class="bar" id="bar">
+  <div class="wrap bar-title">
+    <h1>
+      <svg class="logo" viewBox="0 0 32 32" aria-hidden="true">
+        <defs><clipPath id="logoClip"><rect x="3" y="3" width="26" height="22" rx="6"/></clipPath></defs>
+        <rect class="sh" x="3" y="6" width="26" height="22" rx="6"/>
+        <rect x="3" y="3" width="26" height="22" rx="6" fill="#fff"/>
+        <rect x="3" y="3" width="16" height="22" fill="#FF5A4D" clip-path="url(#logoClip)"/>
+        <rect class="ol" x="3" y="3" width="26" height="22" rx="6"/>
+      </svg>
+      Meme Machine
+    </h1>
+    <div class="actions">
+      <button class="ibtn" id="searchToggle" type="button" aria-label="Cerca un meme" aria-expanded="false" title="Cerca">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      </button>
+      <button class="ibtn" id="sndBtn" type="button" aria-pressed="false" hidden></button>
+      <button class="ibtn" id="helpBtn" type="button" aria-label="Impostazioni e aiuto" title="Impostazioni e aiuto">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h8M18 7h2M4 17h2M12 17h8"/><circle cx="15" cy="7" r="2.6"/><circle cx="9" cy="17" r="2.6"/></svg>
+        <span class="dot" id="adultDot" hidden>18+</span>
+      </button>
+    </div>
+  </div>
   <div class="wrap bar-main">
     <div class="modes" role="group" aria-label="Modalità di riproduzione">
       <button type="button" id="modeHold" aria-pressed="true" title="Il suono dura finché tieni premuto">Tieni premuto</button>
       <button type="button" id="modeTap" aria-pressed="false" title="Il suono parte e va fino alla fine">Tocca</button>
     </div>
-    <button class="ibtn" id="searchToggle" type="button" aria-label="Cerca un meme" aria-expanded="false" title="Cerca">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-    </button>
     <button class="ibtn" id="rndBtn" type="button" aria-label="Meme a caso" title="Meme a caso">
       <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/><g fill="currentColor" stroke="none"><circle cx="8.5" cy="8.5" r="1.4"/><circle cx="15.5" cy="8.5" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="8.5" cy="15.5" r="1.4"/><circle cx="15.5" cy="15.5" r="1.4"/></g></svg>
     </button>
@@ -302,28 +362,6 @@
   </div>
 </header>
 
-<div class="top">
-  <div class="wrap">
-    <h1>
-      <svg class="logo" viewBox="0 0 32 32" aria-hidden="true">
-        <defs><clipPath id="logoClip"><rect x="3" y="3" width="26" height="22" rx="6"/></clipPath></defs>
-        <rect class="sh" x="3" y="6" width="26" height="22" rx="6"/>
-        <rect x="3" y="3" width="26" height="22" rx="6" fill="#fff"/>
-        <rect x="3" y="3" width="16" height="22" fill="#FF5A4D" clip-path="url(#logoClip)"/>
-        <rect class="ol" x="3" y="3" width="26" height="22" rx="6"/>
-      </svg>
-      Meme Machine
-    </h1>
-    <div class="actions">
-      <button class="ibtn" id="sndBtn" type="button" aria-pressed="false" hidden></button>
-      <button class="ibtn" id="themeBtn" type="button" aria-label="Cambia tema"></button>
-      <button class="ibtn" id="helpBtn" type="button" aria-label="Come si usa" title="Come si usa">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 0 1 4.9.7c0 1.7-2.5 2.2-2.5 3.8"/><circle cx="12" cy="17.2" r=".7" fill="currentColor" stroke="none"/></svg>
-      </button>
-    </div>
-  </div>
-</div>
-
 <div class="tools">
   <div class="chips" id="chips" role="group" aria-label="Categorie" hidden></div>
 </div>
@@ -331,10 +369,24 @@
 <div class="sheet-wrap" id="helpWrap" hidden>
   <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
     <div class="sheet-head">
-      <h2 id="helpTitle">Come si usa</h2>
+      <h2 id="helpTitle">Impostazioni e aiuto</h2>
       <button class="ibtn" id="helpClose" type="button" aria-label="Chiudi">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
       </button>
+    </div>
+    <h3>Aspetto</h3>
+    <div class="modes" role="group" aria-label="Tema">
+      <button type="button" data-theme-opt="auto" aria-pressed="true">Automatico</button>
+      <button type="button" data-theme-opt="light" aria-pressed="false">Chiaro</button>
+      <button type="button" data-theme-opt="dark" aria-pressed="false">Scuro</button>
+    </div>
+    <h3>Contenuti</h3>
+    <div class="setting">
+      <div class="setting-text">
+        <b id="adultLabel">Contenuti per adulti (18+)</b>
+        <p id="adultDesc">Mostra anche i meme con parolacce. Se è spento, l'app è adatta a tutti.</p>
+      </div>
+      <button class="switch" id="adultSwitch" type="button" role="switch" aria-checked="false" aria-labelledby="adultLabel" aria-describedby="adultDesc"><span class="knob"></span></button>
     </div>
     <h3>Modalità</h3>
     <ul class="legend">
@@ -348,8 +400,18 @@
       <li><span class="lg-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2.5" fill="currentColor" stroke="none"/></svg></span><p>Ferma tutti i suoni.</p></li>
       <li><span class="lg-ico fav-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9L12 3.5z"/></svg></span><p>La stella su ogni meme lo aggiunge ai preferiti, che ritrovi nel filtro «Preferiti».</p></li>
       <li id="lgSnd" hidden><span class="lg-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg></span><p>Fa sentire i meme anche con il tasto silenzioso dell'iPhone attivo.</p></li>
-      <li><span class="lg-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></span><p>Passa dal tema chiaro a quello scuro.</p></li>
     </ul>
+  </div>
+</div>
+
+<div class="dlg-wrap" id="adultDlg" hidden>
+  <div class="dlg" role="alertdialog" aria-modal="true" aria-labelledby="dlgTitle" aria-describedby="dlgText">
+    <h2 id="dlgTitle">Contenuti per adulti</h2>
+    <p id="dlgText">Alcuni meme contengono parolacce. Attivali solo se va bene per chi ti sta intorno.</p>
+    <div class="dlg-btns">
+      <button class="ibtn ibtn-text" id="dlgCancel" type="button">Annulla</button>
+      <button class="ibtn ibtn-text btn-primary" id="dlgOk" type="button">Attiva</button>
+    </div>
   </div>
 </div>
 
@@ -371,7 +433,6 @@
 
   // ---------- Tema chiaro/scuro (segue il sistema finché non scegli tu) ----------
   const root = document.documentElement;
-  const themeBtn = document.getElementById("themeBtn");
   function setThemeColor(c) { // ricrea il tag: alcuni browser non rileggono un tag già presente
     document.querySelectorAll('meta[name="theme-color"]').forEach(m => m.remove());
     const m = document.createElement("meta");
@@ -385,20 +446,27 @@
     return t ? t === "dark" : darkQuery.matches;
   }
   const SVG_OPEN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">';
-  const ICON_SUN = SVG_OPEN + '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
-  const ICON_MOON = SVG_OPEN + '<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>';
-  function paintTheme() {
-    const dark = isDark();
-    themeBtn.innerHTML = dark ? ICON_SUN : ICON_MOON;
-    themeBtn.setAttribute("aria-label", dark ? "Passa al tema chiaro" : "Passa al tema scuro");
-    setThemeColor(dark ? "#1B1E4D" : "#E9ECFF");
+  function themeChoice() {
+    const t = root.getAttribute("data-theme");
+    return t === "light" || t === "dark" ? t : "auto";
   }
-  themeBtn.addEventListener("click", () => {
-    const next = isDark() ? "light" : "dark";
-    root.setAttribute("data-theme", next);
-    try { localStorage.setItem("mm-theme", next); } catch (e) {}
+  const themeOpts = document.querySelectorAll("[data-theme-opt]");
+  function paintTheme() {
+    setThemeColor(isDark() ? "#1B1E4D" : "#E9ECFF");
+    const c = themeChoice();
+    themeOpts.forEach(b => b.setAttribute("aria-pressed", b.dataset.themeOpt === c));
+  }
+  function setTheme(c) {
+    if (c === "auto") { // torna a seguire il tema del telefono
+      root.removeAttribute("data-theme");
+      try { localStorage.removeItem("mm-theme"); } catch (e) {}
+    } else {
+      root.setAttribute("data-theme", c);
+      try { localStorage.setItem("mm-theme", c); } catch (e) {}
+    }
     paintTheme();
-  });
+  }
+  themeOpts.forEach(b => b.addEventListener("click", () => setTheme(b.dataset.themeOpt)));
   if (darkQuery.addEventListener) darkQuery.addEventListener("change", paintTheme);
   paintTheme();
 
@@ -569,6 +637,13 @@
   try { JSON.parse(localStorage.getItem("mm-favs") || "[]").forEach(f => favs.add(f)); } catch (e) {}
   function saveFavs() { try { localStorage.setItem("mm-favs", JSON.stringify([...favs])); } catch (e) {} }
 
+  // Contenuti per adulti (parolacce): nascosti all'inizio, si attivano dalle impostazioni.
+  // In sounds.js si segnano con  nsfw: true  (oppure con la parola "nsfw" nei tags).
+  let showAdult = false;
+  try { showAdult = localStorage.getItem("mm-adult") === "on"; } catch (e) {}
+  const isAdult = def => !!def.nsfw || /\bnsfw\b/i.test(def.tags || "");
+  const allowed = p => showAdult || !p.adult;
+
   const grid = document.getElementById("grid");
   const pads = (window.SOUNDS || []).map((def, i) => {
     const el = document.createElement("button");
@@ -591,11 +666,13 @@
     fav.type = "button";
     fav.className = "fav";
     fav.innerHTML = STAR_SVG;
+    if (isAdult(def)) el.insertAdjacentHTML("beforeend", '<span class="tag18" aria-hidden="true">18+</span>');
+    cell.hidden = isAdult(def) && !showAdult; // già nascosto al primo disegno della pagina
     cell.appendChild(el);
     cell.appendChild(fav);
     grid.appendChild(cell);
     return {
-      def, i, el, cell, fav,
+      def, i, el, cell, fav, adult: isAdult(def),
       fillEl: el.querySelector(".fill"),
       durEl: el.querySelector(".dur"),
       buffer: null, demo: false,
@@ -604,22 +681,23 @@
     };
   });
 
-  function loadAll() {
-    return Promise.all(pads.map(async p => {
-      try {
-        const res = await fetch(p.def.file);
-        if (!res.ok) throw new Error("HTTP " + res.status);
-        p.buffer = await decode(await res.arrayBuffer());
-      } catch (err) {
-        console.warn("Audio non caricato (" + p.def.file + "), uso un suono demo.", err);
-        p.buffer = makeDemo(p.i);
-        p.demo = true;
-      }
-      const secs = p.buffer.duration.toFixed(1).replace(".", ",") + " s";
-      p.durEl.textContent = p.demo ? "demo · " + secs : secs;
-      p.el.classList.remove("loading");
-    }));
+  async function loadPad(p) {
+    if (p.loaded) return;
+    p.loaded = true;
+    try {
+      const res = await fetch(p.def.file);
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      p.buffer = await decode(await res.arrayBuffer());
+    } catch (err) {
+      console.warn("Audio non caricato (" + p.def.file + "), uso un suono demo.", err);
+      p.buffer = makeDemo(p.i);
+      p.demo = true;
+    }
+    const secs = p.buffer.duration.toFixed(1).replace(".", ",") + " s";
+    p.durEl.textContent = p.demo ? "demo · " + secs : secs;
+    p.el.classList.remove("loading");
   }
+  function loadAll() { return Promise.all(pads.filter(allowed).map(loadPad)); }
 
   // ---------- Riproduzione ----------
   let raf = 0;
@@ -747,7 +825,7 @@
     pads.forEach(p => {
       const inCat = activeCat === "all" ||
         (activeCat === "fav" ? favs.has(p.def.file) : p.def.cat === activeCat);
-      const ok = inCat && words.every(w => p.hay.includes(w));
+      const ok = allowed(p) && inCat && words.every(w => p.hay.includes(w));
       p.cell.hidden = !ok;
       if (ok) { shown++; return; }
       stopPad(p); p.down = false; p.el.classList.remove("active"); // un meme nascosto non deve continuare a suonare
@@ -787,13 +865,46 @@
   helpWrap.addEventListener("click", e => { if (e.target === helpWrap) openHelp(false); });
   document.addEventListener("keydown", e => { if (e.key === "Escape" && !helpWrap.hidden) openHelp(false); });
 
+  // ---------- Contenuti per adulti ----------
+  const adultSwitch = document.getElementById("adultSwitch");
+  const adultDot = document.getElementById("adultDot");
+  const adultDlg = document.getElementById("adultDlg");
+  function paintAdult() {
+    adultSwitch.setAttribute("aria-checked", showAdult);
+    adultDot.hidden = !showAdult;
+  }
+  function setAdult(on) {
+    showAdult = on;
+    try { localStorage.setItem("mm-adult", on ? "on" : "off"); } catch (e) {}
+    paintAdult();
+    if (on) pads.filter(p => p.adult).forEach(loadPad); // gli audio per adulti si scaricano solo ora
+    buildChips();
+    applyFilter(); // spegnendo, i meme per adulti spariscono e si fermano
+  }
+  function openAdultDlg(open) {
+    adultDlg.hidden = !open;
+    if (open) document.getElementById("dlgCancel").focus();
+  }
+  adultSwitch.addEventListener("click", () => { if (showAdult) setAdult(false); else openAdultDlg(true); });
+  document.getElementById("dlgCancel").addEventListener("click", () => openAdultDlg(false));
+  document.getElementById("dlgOk").addEventListener("click", () => { openAdultDlg(false); setAdult(true); });
+  adultDlg.addEventListener("click", e => { if (e.target === adultDlg) openAdultDlg(false); });
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && !adultDlg.hidden) openAdultDlg(false); });
+  paintAdult();
+
   // ---------- Categorie ----------
   const chipsEl = document.getElementById("chips");
-  const cats = [];
-  pads.forEach(p => { if (p.def.cat && !cats.includes(p.def.cat)) cats.push(p.def.cat); });
+  let cats = [];
+  function computeCats() {
+    const list = [];
+    pads.forEach(p => { if (p.def.cat && allowed(p) && !list.includes(p.def.cat)) list.push(p.def.cat); });
+    return list;
+  }
 
   function refreshChips() { chipsEl.hidden = !(cats.length || favs.size || activeCat !== "all"); }
   function buildChips() {
+    cats = computeCats();
+    if (activeCat !== "all" && activeCat !== "fav" && !cats.includes(activeCat)) activeCat = "all";
     chipsEl.innerHTML = "";
     [{ id: "all", label: "Tutti" }, { id: "fav", label: "Preferiti", star: true }]
       .concat(cats.map(c => ({ id: c, label: c })))
